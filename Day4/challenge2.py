@@ -24,9 +24,9 @@ entries = []
 for s in str:
     val = re.search(r'\[(\d+)-(\d+)-(\d+) (\d+):(\d+)\] (falls asleep|wakes up|Guard #(\d+) begins shift)',s)
     if "Guard" in val.group(6):
-    	entryObj = Entry(int(val.group(1)), int(val.group(2)), int(val.group(3)), int(val.group(4)), int(val.group(5)), val.group(6), int(val.group(7)))
+        entryObj = Entry(int(val.group(1)), int(val.group(2)), int(val.group(3)), int(val.group(4)), int(val.group(5)), val.group(6), int(val.group(7)))
     else:
-    	entryObj = Entry(int(val.group(1)), int(val.group(2)), int(val.group(3)), int(val.group(4)), int(val.group(5)), val.group(6), -1)
+        entryObj = Entry(int(val.group(1)), int(val.group(2)), int(val.group(3)), int(val.group(4)), int(val.group(5)), val.group(6), -1)
     entries.append(entryObj)
 
 sortedEntries = sorted(entries, key=functools.cmp_to_key(compareDate))
@@ -35,34 +35,27 @@ guardArray = [ {} for x in range (10000) ]
 currGID = -1
 sleepStart = -1
 for e in sortedEntries:
-	if e.gid != -1:
-		currGID = e.gid
-		continue
-	elif e.message == "falls asleep":
-		sleepStart = e.minute
-	elif e.message == "wakes up":
-		for i in range(sleepStart, e.minute):
-			if i in guardArray[currGID]:
-				guardArray[currGID][i] += 1
-			else:
-				guardArray[currGID][i] = 1
+    if e.gid != -1:
+        currGID = e.gid
+        continue
+    elif e.message == "falls asleep":
+        sleepStart = e.minute
+    elif e.message == "wakes up":
+        for i in range(sleepStart, e.minute):
+            if i in guardArray[currGID]:
+                guardArray[currGID][i] += 1
+            else:
+                guardArray[currGID][i] = 1
 
-maxSlept = -1
-maxSleptGID = -1
-for i in range(len(guardArray)):
-	currSlept = 0
-	for key,value in guardArray[i].items():
-		currSlept += value
-	if currSlept > maxSlept:
-		maxSlept = currSlept
-		maxSleptGID = i
-
-maxMinute = -1
 maxValue = 0
-for key,value in guardArray[maxSleptGID].items():
-	if value > maxValue:
-		maxValue = value
-		maxMinute = key
-print(maxSleptGID)
+maxMinute = -1
+maxMinuteGID = -1
+for i in range(len(guardArray)):
+    for key,value in guardArray[i].items():
+        if value > maxValue:
+            maxValue = value
+            maxMinute = key
+            maxMinuteGID = i
 print(maxMinute)
-print(maxSleptGID * maxMinute)
+print(maxMinuteGID)
+print(maxMinuteGID * maxMinute)
